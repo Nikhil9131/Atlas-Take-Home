@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: atlas_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root_secret
+      MYSQL_DATABASE: atlas_db
+      MYSQL_USER: atlas_user
+      MYSQL_PASSWORD: atlas_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./database/seed_data.sql:/docker-entrypoint-initdb.d/02_seed_data.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_secret"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - atlas_network
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    container_name: atlas_api
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: mysql+pymysql://atlas_user:atlas_pass@mysql:3306/atlas_db
+      API_KEY: atlas-secret-key-2025
+      CHROMA_PERSIST_DIRECTORY: /app/data/vector_db
+      LLM_PROVIDER: deterministic
+      EMBEDDING_PROVIDER: chroma_default
+      ESCALATION_CONFIDENCE_THRESHOLD: 0.70
+      REQUEST_TIMEOUT_SECONDS: 30.0
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/app/data/vector_db
+      - ./data/reports:/app/data/reports:ro
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - atlas_network
+
+  portal:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.ci3
+    container_name: atlas_portal
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    environment:
+      FASTAPI_URL: http://api:8000
+      API_KEY: atlas-secret-key-2025
+      MYSQL_HOST: mysql
+      MYSQL_USER: atlas_user
+      MYSQL_PASSWORD: atlas_pass
+      MYSQL_DATABASE: atlas_db
+    ports:
+      - "8080:80"
+    networks:
+      - atlas_network
+
+volumes:
+  mysql_data:
+  chroma_data:
+
+networks:
+  atlas_network:
+    driver: bridge

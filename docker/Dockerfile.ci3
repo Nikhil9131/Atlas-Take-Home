@@ -1,0 +1,28 @@
+FROM php:8.2-apache
+
+# Install required PHP extensions
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libcurl4-openssl-dev \
+    libzip-dev \
+    curl \
+    && docker-php-ext-install mysqli curl \
+    && a2enmod rewrite \
+    && rm -rf /var/lib/apt/lists/*
+
+# Apache VirtualHost configuration for CodeIgniter 3
+RUN echo '<Directory /var/www/html>\n\
+    Options Indexes FollowSymLinks\n\
+    AllowOverride All\n\
+    Require all granted\n\
+</Directory>' > /etc/apache2/conf-available/ci3.conf \
+    && a2enconf ci3
+
+# Copy CodeIgniter 3 portal files
+COPY ci3_portal/ /var/www/html/
+
+# Permissions
+RUN chown -R www-data:www-data /var/www/html
+
+EXPOSE 80
+
+CMD ["apache2-foreground"]
