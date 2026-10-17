@@ -1,6 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+#[AllowDynamicProperties]
 class CI_Loader {
 	protected $_ci_classes = array();
 	protected $_ci_loaded_files = array();
