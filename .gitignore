@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.venv/
+venv/
+ENV/
+env/
+
+# Environment Variables & Secrets (NEVER COMMIT SECRETS)
+.env
+*.env
+!.env.example
+
+# Databases & Vector Stores
+*.db
+*.sqlite
+*.sqlite3
+chroma_data/
+data/vector_db/
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# CodeIgniter
+ci3_portal/application/cache/*
+!ci3_portal/application/cache/index.html
+!ci3_portal/application/cache/.gitkeep
+ci3_portal/application/logs/log-*.php
+
+# IDE & OS
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
