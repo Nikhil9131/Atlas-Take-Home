@@ -1,6 +1,5 @@
 # Project Atlas: AI Research Copilot
-### Cognitive Market Research and Consulting | Viman Nagar, Pune
-**Production-Style Evidence-Grounded AI Research Copilot Integrated into a Legacy CodeIgniter 3 Portal**
+### Cognitive Market Research and Consulting
 
 ---
 
