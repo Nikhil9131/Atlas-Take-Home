@@ -1,6 +1,15 @@
 # Project Atlas: AI Research Copilot
 ### Cognitive Market Research and Consulting
 
+[![Watch Demo Video](https://img.shields.io/badge/Demo%20Video-Google%20Drive-4285F4?style=for-the-badge&logo=googledrive&logoColor=white)](https://drive.google.com/file/d/1TgR30Zq4_rPlWGKy4eDBU3P5hx7Yj0gQ/view?usp=sharing)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![PHP CodeIgniter 3](https://img.shields.io/badge/CodeIgniter%203-EE4326?style=for-the-badge&logo=codeigniter&logoColor=white)](https://codeigniter.com)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com)
+
+> 🎥 **Video Walkthrough (Google Drive):**  
+> **[Click here to watch the Project Atlas Video Demonstration](https://drive.google.com/file/d/1TgR30Zq4_rPlWGKy4eDBU3P5hx7Yj0gQ/view?usp=sharing)**  
+> *Demonstrating end-to-end agent workflow: standard query grounding, conflicting source resolution (R-101 vs R-102), prompt injection isolation, entitlement boundary enforcement (C-01 vs C-02), human escalation queue, and the legacy CodeIgniter 3 portal.*
+
 ---
 
 ## 1. Project Overview & Business Scenario
@@ -239,11 +248,3 @@ In adherence to Section 18 of the assignment instructions, AI coding assistance 
 * **Report Ingestion Parsing:** Authoring regex patterns for page-delimiter parsing and indirect injection sanitization.
 
 All generated code was inspected, debugged, locally tested against live PHP 8.2 and Python 3.12 runtimes, and validated against the assignment requirements.
-
----
-
-## 11. Additional Deliverables
-
-* [`DEMO_SCRIPT.md`](DEMO_SCRIPT.md): Complete 3 to 5-minute video demonstration script.
-* [`EVALUATION_REPORT.md`](EVALUATION_REPORT.md): Full evaluation dataset results and edge-case failure analysis.
-* [`WHAT_I_WOULD_DO_WITH_ONE_MORE_WEEK.md`](WHAT_I_WOULD_DO_WITH_ONE_MORE_WEEK.md): Prioritized engineering roadmap for production scaling.
