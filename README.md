@@ -241,10 +241,18 @@ See [`EVALUATION_REPORT.md`](EVALUATION_REPORT.md) for the full 25-case results 
 
 ## 10. AI-Assisted Engineering Disclosure
 
-In adherence to Section 18 of the assignment instructions, AI coding assistance (Antigravity IDE with Gemini 3.8 Flash) was utilized for:
-* **Architecture Brainstorming:** Designing the decoupled pre-retrieval entitlement boundary and deterministic calculator state graph.
-* **Code Scaffolding:** Drafting initial Pydantic schemas, SQLAlchemy relational models, and CodeIgniter 3 helper wrappers.
-* **Test Dataset Generation:** Formulating comprehensive test prompts for the 25-case evaluation benchmark.
-* **Report Ingestion Parsing:** Authoring regex patterns for page-delimiter parsing and indirect injection sanitization.
+In full adherence to Section 18 of the assignment instructions, the following AI-assisted design and engineering tools were utilized during the development of Project Atlas:
 
-All generated code was inspected, debugged, locally tested against live PHP 8.2 and Python 3.12 runtimes, and validated against the assignment requirements.
+* **Google Antigravity IDE & Gemini (Gemini 3.8 Flash / Gemini Pro):**
+  * **System Architecture & Workflow Design:** Co-designing the state machine graph (analytical routing, conflict detection, deterministic calculation, and critic verification).
+  * **Backend Scaffolding & Integration:** Drafting typed Pydantic v2 schemas, SQLAlchemy ORM models, and the CodeIgniter 3 HTTP client library.
+  * **Debugging & Test Automation:** Local test execution, deprecation fixes across PHP 8.2 and Python 3.12 runtimes, and benchmark harness implementation.
+
+* **OpenAI ChatGPT (GPT-4o):**
+  * **Synthetic Report Expansion:** Expanding the seed market research reports (R-101 through R-106) with realistic domain narratives while embedding adversarial footnote traps.
+  * **Evaluation Prompt Generation:** Formulating diverse prompt permutations for the 25-case evaluation benchmark (including prompt injection, out-of-scope, and cross-source comparison queries).
+
+* **Figma (Figma AI & Prototyping):**
+  * **UI/UX & Portal Layout Design:** Wireframing and prototyping the enterprise dark-mode theme, citation cards, source-conflict badges, and the human escalation review queue for the CodeIgniter 3 views.
+
+All generated code, prompts, UI assets, and architecture patterns were thoroughly reviewed, manually inspected, locally tested against live PHP 8.2 and Python 3.12 runtimes, and validated against the assignment requirements.
