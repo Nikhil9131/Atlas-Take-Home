@@ -32,14 +32,28 @@ class Chat extends CI_Controller {
         $clients = array(
             'C-01' => array(
                 'name' => 'Northwind Utilities',
-                'entitlements' => array('R-101: Global Smart Water Meter Market 2025', 'R-103: Residential Water Purifier Market 2025'),
-                'public_access' => array('R-102: Industry Outlook 2024 (Public Excerpt)')
+                'sector' => 'Utilities & Infrastructure Grid',
+                'entitlements' => array(
+                    array('id' => 'R-101', 'title' => 'Global Smart Water Meter Market 2025', 'access' => 'paid', 'pages' => 42, 'sector' => 'Utilities', 'focus' => 'Total ecosystem: hardware, software, analytics & services', 'forecast' => '2025-2030', 'status' => 'active', 'text' => 'R-101: Global Smart Water Meter Market 2025'),
+                    array('id' => 'R-103', 'title' => 'Residential Water Purifier Market 2025', 'access' => 'paid', 'pages' => 36, 'sector' => 'Consumer Durables', 'focus' => 'Point-of-use reverse osmosis, UV, gravity filters', 'forecast' => '2025-2030', 'status' => 'active', 'text' => 'R-103: Residential Water Purifier Market 2025')
+                ),
+                'public_access' => array(
+                    array('id' => 'R-102', 'title' => 'Smart Water Metering: Industry Outlook 2024', 'access' => 'public', 'pages' => 28, 'sector' => 'Utilities', 'focus' => 'AMR/AMI hardware unit shipments only', 'forecast' => '2024-2029', 'status' => 'public', 'text' => 'R-102: Industry Outlook 2024 (Public Excerpt)')
+                ),
+                'restricted' => array()
             ),
             'C-02' => array(
                 'name' => 'Blue Delta Infra',
-                'entitlements' => array('R-103: Residential Water Purifier Market 2025'),
-                'public_access' => array('R-102: Industry Outlook 2024 (Public Excerpt)'),
-                'restricted' => array('R-101: Global Smart Water Meter Market 2025 (UNPURCHASED)')
+                'sector' => 'Industrial Infrastructure & Energy',
+                'entitlements' => array(
+                    array('id' => 'R-103', 'title' => 'Residential Water Purifier Market 2025', 'access' => 'paid', 'pages' => 36, 'sector' => 'Consumer Durables', 'focus' => 'Point-of-use reverse osmosis, UV, gravity filters', 'forecast' => '2025-2030', 'status' => 'active', 'text' => 'R-103: Residential Water Purifier Market 2025')
+                ),
+                'public_access' => array(
+                    array('id' => 'R-102', 'title' => 'Smart Water Metering: Industry Outlook 2024', 'access' => 'public', 'pages' => 28, 'sector' => 'Utilities', 'focus' => 'AMR/AMI hardware unit shipments only', 'forecast' => '2024-2029', 'status' => 'public', 'text' => 'R-102: Industry Outlook 2024 (Public Excerpt)')
+                ),
+                'restricted' => array(
+                    array('id' => 'R-101', 'title' => 'Global Smart Water Meter Market 2025', 'access' => 'paid', 'pages' => 42, 'sector' => 'Utilities', 'focus' => 'Total ecosystem: hardware, software, analytics & services', 'forecast' => '2025-2030', 'status' => 'restricted', 'text' => 'R-101: Global Smart Water Meter Market 2025 (UNPURCHASED)')
+                )
             )
         );
 
@@ -52,6 +66,24 @@ class Chat extends CI_Controller {
         );
 
         $this->load->view('chat_view', $data);
+    }
+
+    /**
+     * Clear active session conversation ID for a fresh session.
+     */
+    public function reset_chat() {
+        $this->session->unset_userdata('conversation_id');
+
+        if ($this->input->is_ajax_request()) {
+            return $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode(array(
+                    'success' => TRUE,
+                    'csrf_hash' => $this->security->get_csrf_hash()
+                )));
+        }
+
+        redirect('chat');
     }
 
     /**

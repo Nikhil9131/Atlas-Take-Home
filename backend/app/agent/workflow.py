@@ -17,6 +17,10 @@ from backend.app.agent.nodes.writer_node import writer_node
 from backend.app.db.models import Conversation, ConversationMessage, AuditEvent
 from backend.app.core.logging import logger
 
+# Entitlement-aware query cache: key -> {response: ChatResponse, timestamp: float, tokens_used: int}
+_QUERY_CACHE: Dict[str, Dict[str, Any]] = {}
+CACHE_TTL_SECONDS = 300  # 5-minute cache TTL
+
 
 class AgentWorkflow:
     """Orchestrates research copilot pipeline adhering strictly to security and entitlement boundaries."""
@@ -26,6 +30,28 @@ class AgentWorkflow:
         req_id = request_id or f"req-{uuid.uuid4().hex[:8]}"
         conv_id = request.conversation_id or f"conv-{uuid.uuid4().hex[:8]}"
         start_time = time.time()
+
+        # Cache check for repeated questions (entitlement-isolated)
+        cache_key = f"{request.client_id}::{request.question.strip().lower()}"
+        if cache_key in _QUERY_CACHE:
+            entry = _QUERY_CACHE[cache_key]
+            if time.time() - entry["timestamp"] < CACHE_TTL_SECONDS:
+                cached_resp = entry["response"]
+                logger.info(
+                    f"Query cache hit for client {request.client_id}: '{request.question[:50]}...'",
+                    extra={"client_id": request.client_id, "cache_hit": True, "tokens_used": entry["tokens_used"], "cost_usd": 0.0}
+                )
+                return ChatResponse(
+                    answer=cached_resp.answer,
+                    citations=cached_resp.citations,
+                    confidence=cached_resp.confidence,
+                    conflicts=cached_resp.conflicts,
+                    derived_values=cached_resp.derived_values,
+                    escalated=cached_resp.escalated,
+                    ticket_id=cached_resp.ticket_id,
+                    request_id=req_id,
+                    conversation_id=conv_id
+                )
 
         # Initialize State
         state = AgentState(
@@ -116,6 +142,13 @@ class AgentWorkflow:
     ) -> ChatResponse:
         duration_ms = (time.time() - start_time) * 1000.0
 
+        # Calculate estimated token usage and request cost (per assignment requirement)
+        prompt_tokens = max(1, len(state.question) // 4)
+        answer_tokens = max(1, len(state.answer) // 4)
+        total_tokens = prompt_tokens + answer_tokens
+        # $0.00015 per 1k tokens model estimate
+        cost_usd = round((total_tokens / 1000.0) * 0.00015, 6)
+
         # Persist Assistant Response Message
         asst_msg_id = f"msg-{uuid.uuid4().hex[:8]}"
         metadata = {
@@ -124,7 +157,9 @@ class AgentWorkflow:
             "ticket_id": state.ticket_id,
             "citations_count": len(state.citations),
             "conflicts_count": len(state.conflicts),
-            "duration_ms": round(duration_ms, 2)
+            "duration_ms": round(duration_ms, 2),
+            "tokens_used": total_tokens,
+            "cost_usd": cost_usd
         }
         asst_msg = ConversationMessage(
             id=asst_msg_id,
@@ -141,11 +176,18 @@ class AgentWorkflow:
             logger.warning(f"Could not persist assistant message: {e}")
 
         logger.info(
-            f"Completed workflow in {duration_ms:.2f}ms. Escalated: {state.escalated}, Confidence: {state.confidence:.2f}",
-            extra={"duration_ms": duration_ms, "client_id": state.client_id, "request_id": state.request_id}
+            f"Completed workflow in {duration_ms:.2f}ms. Escalated: {state.escalated}, Confidence: {state.confidence:.2f}, Tokens: {total_tokens}, Cost: ${cost_usd}",
+            extra={
+                "duration_ms": duration_ms,
+                "client_id": state.client_id,
+                "request_id": state.request_id,
+                "tokens_used": total_tokens,
+                "cost_usd": cost_usd,
+                "cache_hit": False
+            }
         )
 
-        return ChatResponse(
+        response = ChatResponse(
             answer=state.answer,
             citations=state.citations,
             confidence=round(state.confidence, 2),
@@ -156,3 +198,13 @@ class AgentWorkflow:
             request_id=state.request_id,
             conversation_id=conv_id
         )
+
+        # Store in query cache (entitlement-isolated)
+        cache_key = f"{state.client_id}::{state.question.strip().lower()}"
+        _QUERY_CACHE[cache_key] = {
+            "response": response,
+            "timestamp": time.time(),
+            "tokens_used": total_tokens
+        }
+
+        return response

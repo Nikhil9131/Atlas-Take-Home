@@ -9,5 +9,6 @@ $route['chat'] = 'chat/index';
 $route['chat/send'] = 'chat/send';
 $route['chat/switch_client'] = 'chat/switch_client';
 $route['chat/feedback'] = 'chat/feedback';
+$route['chat/reset'] = 'chat/reset_chat';
 $route['escalations'] = 'escalations/index';
 $route['health'] = 'chat/health';
